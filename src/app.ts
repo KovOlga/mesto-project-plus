@@ -9,6 +9,7 @@ import UsersRouter from "./routes/users";
 import CardsRouter from "./routes/cards";
 import AuthenticationRouter from "./routes/authentication";
 import { PORT, DB_ADDRESS } from "./config";
+import { requestLogger, errorLogger } from "./middlewares/logger";
 
 const app = express();
 
@@ -18,6 +19,7 @@ app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+app.use(requestLogger);
 app.use("/", AuthenticationRouter);
 
 app.use(auth);
@@ -26,8 +28,8 @@ app.use("/cards", CardsRouter);
 
 app.use(express.static(path.join(__dirname, "public")));
 
+app.use(errorLogger);
 app.use(errors());
-
 app.use(errorHandler);
 
 app.listen(PORT, () => {
