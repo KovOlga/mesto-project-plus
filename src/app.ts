@@ -5,10 +5,8 @@ import mongoose from "mongoose";
 import errorHandler from "./middlewares/error-handler";
 import UsersRouter from "./routes/users";
 import CardsRouter from "./routes/cards";
+import { PORT, DB_ADDRESS } from "./config";
 
-// eslint-disable-next-line operator-linebreak
-const { PORT = 3000, DB_ADDRESS = "mongodb://localhost:27017/mestodb" } =
-  process.env;
 const app = express();
 
 mongoose.connect(DB_ADDRESS);
