@@ -6,15 +6,15 @@ import errorHandler from "./middlewares/error-handler";
 import UsersRouter from "./routes/users";
 import CardsRouter from "./routes/cards";
 
-mongoose.connect("mongodb://localhost:27017/mestodb");
-
-const { PORT = 3000 } = process.env;
+// eslint-disable-next-line operator-linebreak
+const { PORT = 3000, DB_ADDRESS = "mongodb://localhost:27017/mestodb" } =
+  process.env;
 const app = express();
+
+mongoose.connect(DB_ADDRESS);
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
-mongoose.connect("mongodb://localhost:27017/mestodb");
 
 app.use((req: Request, _res: Response, next) => {
   req.body = {
