@@ -1,5 +1,7 @@
 import validator from "validator";
 import mongoose from "mongoose";
+import bcrypt from "bcryptjs";
+import AuthenticationError from "../errors/authentication-err";
 
 export interface IUser {
   name: string;
@@ -9,23 +11,33 @@ export interface IUser {
   password: string;
 }
 
+interface UserModel extends mongoose.Model<IUser> {
+  findUserByCredentials: (
+    // eslint-disable-next-line no-unused-vars
+    email: string,
+    // eslint-disable-next-line no-unused-vars
+    password: string
+  ) => Promise<mongoose.Document<unknown, any, IUser>>;
+}
+
 const userSchema = new mongoose.Schema<IUser>(
   {
     name: {
       type: String,
-      required: true,
       minlength: 2,
       maxlength: 30,
+      default: "Жак-Ив Кусто",
     },
     about: {
       type: String,
-      required: true,
       minlength: 2,
       maxlength: 200,
+      default: "Исследователь",
     },
     avatar: {
       type: String,
-      required: true,
+      default:
+        "https://pictures.s3.yandex.net/resources/jacques-cousteau_1604399756.png",
     },
     email: {
       type: String,
@@ -44,4 +56,27 @@ const userSchema = new mongoose.Schema<IUser>(
   { versionKey: false }
 );
 
-export default mongoose.model<IUser>("User", userSchema);
+userSchema.static(
+  "findUserByCredentials",
+  function findUserByCredentials(email: string, password: string) {
+    return this.findOne({ email }).then((user: IUser) => {
+      if (!user) {
+        return Promise.reject(
+          new AuthenticationError("Неправильные почта или пароль")
+        );
+      }
+
+      return bcrypt.compare(password, user.password).then((matched) => {
+        if (!matched) {
+          return Promise.reject(
+            new AuthenticationError("Неправильные почта или пароль")
+          );
+        }
+
+        return user;
+      });
+    });
+  }
+);
+
+export default mongoose.model<IUser, UserModel>("User", userSchema);

@@ -2,15 +2,18 @@ import path from "path";
 import express, { Request, Response } from "express";
 import { errors } from "celebrate";
 import mongoose from "mongoose";
+import cookieParser from "cookie-parser";
 import errorHandler from "./middlewares/error-handler";
 import UsersRouter from "./routes/users";
 import CardsRouter from "./routes/cards";
+import AuthenticationRouter from "./routes/authentication";
 import { PORT, DB_ADDRESS } from "./config";
 
 const app = express();
 
 mongoose.connect(DB_ADDRESS);
 
+app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -22,6 +25,7 @@ app.use((req: Request, _res: Response, next) => {
 
   next();
 });
+app.use("/", AuthenticationRouter);
 app.use("/users", UsersRouter);
 app.use("/cards", CardsRouter);
 

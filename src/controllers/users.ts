@@ -1,4 +1,7 @@
+/* eslint-disable object-curly-newline */
 import { Request, Response, NextFunction } from "express";
+import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
 import User from "../models/user";
 import NotFoundError from "../errors/not-found-err";
 import BadRequestError from "../errors/bad-request-err";
@@ -27,9 +30,11 @@ export const getUserById = (
 };
 
 export const createUser = (req: Request, res: Response, next: NextFunction) => {
-  const { name, about, avatar } = req.body;
+  const { name, about, avatar, email, password } = req.body;
 
-  return User.create({ name, about, avatar })
+  return bcrypt
+    .hash(password, 10)
+    .then((hash) => User.create({ name, about, avatar, email, password: hash }))
     .then((user) => res.status(201).send(user))
     .catch((err) => {
       if (err.name === "validationError") {
@@ -38,6 +43,19 @@ export const createUser = (req: Request, res: Response, next: NextFunction) => {
         next(err);
       }
     });
+};
+
+export const login = (req: Request, res: Response, next: NextFunction) => {
+  const { email, password } = req.body;
+
+  return User.findUserByCredentials(email, password)
+    .then((user) => {
+      const token = jwt.sign({ _id: user._id }, "super-strong-secret", {
+        expiresIn: "7d",
+      });
+      res.cookie("token", token, { httpOnly: true }).send({ token });
+    })
+    .catch(next);
 };
 
 export const updateProfile = (
