@@ -1,9 +1,12 @@
+import validator from "validator";
 import mongoose from "mongoose";
 
 export interface IUser {
   name: string;
   about: string;
   avatar: string;
+  email: string;
+  password: string;
 }
 
 const userSchema = new mongoose.Schema<IUser>(
@@ -21,6 +24,19 @@ const userSchema = new mongoose.Schema<IUser>(
       maxlength: 200,
     },
     avatar: {
+      type: String,
+      required: true,
+    },
+    email: {
+      type: String,
+      required: true,
+      unique: true,
+      validate: {
+        validator: (v: string) => validator.isEmail(v),
+        message: "Неправильный формат почты",
+      },
+    },
+    password: {
       type: String,
       required: true,
     },
