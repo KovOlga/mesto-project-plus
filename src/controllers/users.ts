@@ -58,7 +58,6 @@ export const createUser = (req: Request, res: Response, next: NextFunction) => {
 
 export const login = (req: Request, res: Response, next: NextFunction) => {
   const { email, password } = req.body;
-  console.log("kmkm", email, password);
   return User.findUserByCredentials(email, password)
     .then((user) => {
       const token = jwt.sign({ _id: user._id }, "super-strong-secret", {
