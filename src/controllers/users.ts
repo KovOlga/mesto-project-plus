@@ -63,7 +63,7 @@ export const login = (req: Request, res: Response, next: NextFunction) => {
       const token = jwt.sign({ _id: user._id }, "super-strong-secret", {
         expiresIn: "7d",
       });
-      res.cookie("token", token, { httpOnly: true }).send({ token });
+      res.cookie("token", token, { httpOnly: true }).send({ token, user });
     })
     .catch(next);
 };

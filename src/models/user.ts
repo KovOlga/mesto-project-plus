@@ -51,6 +51,7 @@ const userSchema = new mongoose.Schema<IUser>(
     password: {
       type: String,
       required: true,
+      select: false,
     },
   },
   { versionKey: false }
@@ -59,23 +60,25 @@ const userSchema = new mongoose.Schema<IUser>(
 userSchema.static(
   "findUserByCredentials",
   function findUserByCredentials(email: string, password: string) {
-    return this.findOne({ email }).then((user: IUser) => {
-      if (!user) {
-        return Promise.reject(
-          new AuthenticationError("Неправильные почта или пароль")
-        );
-      }
-
-      return bcrypt.compare(password, user.password).then((matched) => {
-        if (!matched) {
+    return this.findOne({ email })
+      .select("+password")
+      .then((user: IUser) => {
+        if (!user) {
           return Promise.reject(
             new AuthenticationError("Неправильные почта или пароль")
           );
         }
 
-        return user;
+        return bcrypt.compare(password, user.password).then((matched) => {
+          if (!matched) {
+            return Promise.reject(
+              new AuthenticationError("Неправильные почта или пароль")
+            );
+          }
+
+          return user;
+        });
       });
-    });
   }
 );
 
