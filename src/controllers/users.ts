@@ -5,6 +5,7 @@ import jwt from "jsonwebtoken";
 import User from "../models/user";
 import NotFoundError from "../errors/not-found-err";
 import BadRequestError from "../errors/bad-request-err";
+import { SessionRequest } from "../middlewares/auth";
 
 export const getUsers = (req: Request, res: Response, next: NextFunction) => {
   return User.find({})
@@ -12,13 +13,11 @@ export const getUsers = (req: Request, res: Response, next: NextFunction) => {
     .catch(next);
 };
 
-export const getUserById = (
-  req: Request,
+export const getUserInfoById = (
+  id: string,
   res: Response,
   next: NextFunction
 ) => {
-  const { id } = req.params;
-
   User.findById(id)
     .orFail(() => {
       throw new NotFoundError("Пользователь по указанному _id не найден");
@@ -27,6 +26,18 @@ export const getUserById = (
       return res.status(200).send(user);
     })
     .catch(next);
+};
+
+export const getUser = (req: Request, res: Response, next: NextFunction) => {
+  getUserInfoById(req.params.id, res, next);
+};
+
+export const getCurrentUser = (
+  req: SessionRequest,
+  res: Response,
+  next: NextFunction
+) => {
+  getUserInfoById(req.user!._id, res, next);
 };
 
 export const createUser = (req: Request, res: Response, next: NextFunction) => {
@@ -47,7 +58,7 @@ export const createUser = (req: Request, res: Response, next: NextFunction) => {
 
 export const login = (req: Request, res: Response, next: NextFunction) => {
   const { email, password } = req.body;
-
+  console.log("kmkm", email, password);
   return User.findUserByCredentials(email, password)
     .then((user) => {
       const token = jwt.sign({ _id: user._id }, "super-strong-secret", {

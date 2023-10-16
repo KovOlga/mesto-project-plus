@@ -6,7 +6,8 @@ import {
 } from "../middlewares/validations";
 import {
   getUsers,
-  getUserById,
+  getUser,
+  getCurrentUser,
   updateProfile,
   updateAvatar,
 } from "../controllers/users";
@@ -14,10 +15,11 @@ import {
 const router = Router();
 
 router.get("/", getUsers);
-router.get("/:id", validateObjectId, getUserById);
 
+router.get("/me", getCurrentUser);
 router.patch("/me", validateUserData, updateProfile);
 
 router.patch("/me/avatar", validateAvatar, updateAvatar);
+router.get("/:id", validateObjectId, getUser);
 
 export default router;
