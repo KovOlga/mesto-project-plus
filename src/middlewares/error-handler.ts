@@ -6,7 +6,6 @@ const errorHandler = (
   res: Response,
   next: NextFunction
 ) => {
-  console.log("err", err);
   const { statusCode = 500, message } = err;
 
   res.status(statusCode).send({

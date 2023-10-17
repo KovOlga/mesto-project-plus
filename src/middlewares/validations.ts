@@ -4,7 +4,7 @@ import { Types } from "mongoose";
 // eslint-disable-next-line operator-linebreak
 export const urlRegex =
   // eslint-disable-next-line no-useless-escape
-  /(http(s)?:\/\/)?[\w.-]+(?:\.[\w\.-]+)+[\w\-\._~:\/?#[\]@!\$&'\(\)\*\+,;=.]+$/i;
+  /^(https?:\/\/)(www)?((?!www)[\w\-\.]+)(\.\w{2,})([a-zA-Z\-\._~:\/\?#\[\]@!\$&'\(\)\*\+,;=\w]*)$/i;
 
 export const validateObjectId = celebrate({
   params: Joi.object().keys({
