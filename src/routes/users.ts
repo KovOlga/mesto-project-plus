@@ -18,8 +18,8 @@ router.get("/", getUsers);
 
 router.get("/me", getCurrentUser);
 router.patch("/me", validateUserData, updateProfile);
-
 router.patch("/me/avatar", validateAvatar, updateAvatar);
+
 router.get("/:id", validateObjectId, getUser);
 
 export default router;

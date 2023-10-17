@@ -2,7 +2,7 @@ import validator from "validator";
 import mongoose from "mongoose";
 import bcrypt from "bcryptjs";
 import AuthenticationError from "../errors/authentication-err";
-import { urlReqEx } from "../middlewares/validations";
+import { urlRegex } from "../middlewares/validations";
 
 export interface IUser {
   name: string;
@@ -40,7 +40,7 @@ const userSchema = new mongoose.Schema<IUser>(
       default:
         "https://pictures.s3.yandex.net/resources/jacques-cousteau_1604399756.png",
       validate: {
-        validator: (v: string) => urlReqEx.test(v),
+        validator: (v: string) => urlRegex.test(v),
         message: "Невалидный url-адрес",
       },
     },
