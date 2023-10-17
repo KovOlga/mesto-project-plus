@@ -5,7 +5,40 @@ import jwt from "jsonwebtoken";
 import User from "../models/user";
 import NotFoundError from "../errors/not-found-err";
 import BadRequestError from "../errors/bad-request-err";
+import AuthenticationError from "../errors/authentication-err";
 import { SessionRequest } from "../middlewares/auth";
+
+export const createUser = (req: Request, res: Response, next: NextFunction) => {
+  const { name, about, avatar, email, password } = req.body;
+
+  return bcrypt
+    .hash(password, 10)
+    .then((hash) => User.create({ name, about, avatar, email, password: hash }))
+    .then((user) => res.status(201).send(user))
+    .catch((err) => {
+      if (err.name === "validationError") {
+        next(new BadRequestError(err.message));
+      } else if (err.code === 11000) {
+        next(
+          new AuthenticationError("Пользователь с таким email уже существует")
+        );
+      } else {
+        next(err);
+      }
+    });
+};
+
+export const login = (req: Request, res: Response, next: NextFunction) => {
+  const { email, password } = req.body;
+  return User.findUserByCredentials(email, password)
+    .then((user) => {
+      const token = jwt.sign({ _id: user._id }, "super-strong-secret", {
+        expiresIn: "7d",
+      });
+      res.cookie("token", token, { httpOnly: true }).send({ token, user });
+    })
+    .catch(next);
+};
 
 export const getUsers = (req: Request, res: Response, next: NextFunction) => {
   return User.find({})
@@ -40,43 +73,14 @@ export const getCurrentUser = (
   getUserInfoById(req.user!._id, res, next);
 };
 
-export const createUser = (req: Request, res: Response, next: NextFunction) => {
-  const { name, about, avatar, email, password } = req.body;
-
-  return bcrypt
-    .hash(password, 10)
-    .then((hash) => User.create({ name, about, avatar, email, password: hash }))
-    .then((user) => res.status(201).send(user))
-    .catch((err) => {
-      if (err.name === "validationError") {
-        next(new BadRequestError(err.message));
-      } else {
-        next(err);
-      }
-    });
-};
-
-export const login = (req: Request, res: Response, next: NextFunction) => {
-  const { email, password } = req.body;
-  return User.findUserByCredentials(email, password)
-    .then((user) => {
-      const token = jwt.sign({ _id: user._id }, "super-strong-secret", {
-        expiresIn: "7d",
-      });
-      res.cookie("token", token, { httpOnly: true }).send({ token, user });
-    })
-    .catch(next);
-};
-
 export const updateProfile = (
-  req: Request,
+  req: SessionRequest,
   res: Response,
   next: NextFunction
 ) => {
   const { name, about } = req.body;
-  const id = req.body._id;
 
-  return User.findByIdAndUpdate(id, { name, about }, { new: true })
+  return User.findByIdAndUpdate(req.user!._id, { name, about }, { new: true })
     .orFail(() => {
       throw new NotFoundError("Пользователь по указанному _id не найден");
     })
@@ -91,14 +95,13 @@ export const updateProfile = (
 };
 
 export const updateAvatar = (
-  req: Request,
+  req: SessionRequest,
   res: Response,
   next: NextFunction
 ) => {
   const { avatar } = req.body;
-  const id = req.body._id;
 
-  return User.findByIdAndUpdate(id, { avatar }, { new: true })
+  return User.findByIdAndUpdate(req.user!._id, { avatar }, { new: true })
     .orFail(() => {
       throw new NotFoundError("Пользователь по указанному _id не найден");
     })

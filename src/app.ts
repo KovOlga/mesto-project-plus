@@ -12,21 +12,17 @@ import { PORT, DB_ADDRESS } from "./config";
 import { requestLogger, errorLogger } from "./middlewares/logger";
 
 const app = express();
-
 mongoose.connect(DB_ADDRESS);
-
-app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(express.static(path.join(__dirname, "public")));
+app.use(cookieParser());
 
 app.use(requestLogger);
 app.use("/", AuthenticationRouter);
-
 app.use(auth);
 app.use("/users", UsersRouter);
 app.use("/cards", CardsRouter);
-
-app.use(express.static(path.join(__dirname, "public")));
 
 app.use(errorLogger);
 app.use(errors());

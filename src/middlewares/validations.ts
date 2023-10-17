@@ -1,6 +1,11 @@
 import { celebrate, Joi } from "celebrate";
 import { Types } from "mongoose";
 
+// eslint-disable-next-line operator-linebreak
+export const urlReqEx =
+  // eslint-disable-next-line no-useless-escape
+  /^https?:\/\/?(w{3})?\.?[a-z0-9\-(-._~:\/?#[\]@!\$&'\(\)\*\+,;=)]+\.ru/i;
+
 export const validateObjectId = celebrate({
   params: Joi.object().keys({
     id: Joi.string()
@@ -30,8 +35,8 @@ export const validateUserProfile = celebrate({
         "string.empty": 'Поле "about" должно быть заполнено',
       }),
       avatar: Joi.string()
-        .uri()
-        .message('В поле "avatar" необходимо вставить ссылку')
+        .pattern(urlReqEx)
+        .message("Невалидный url-адрес")
         .messages({
           "string.empty": 'Поле "avatar" должно быть заполнено',
         }),
@@ -73,8 +78,8 @@ export const validateAvatar = celebrate({
     .keys({
       avatar: Joi.string()
         .required()
-        .uri()
-        .message('В поле "avatar" необходимо вставить ссылку')
+        .pattern(urlReqEx)
+        .message("Невалидный url-адрес")
         .messages({
           "string.empty": 'Поле "avatar" должно быть заполнено',
         }),
@@ -87,7 +92,7 @@ export const validateNewCard = celebrate({
     .keys({
       link: Joi.string()
         .required()
-        .uri()
+        .pattern(urlReqEx)
         .message("Необходимо вставить ссылку")
         .messages({
           "string.empty": "Поле с ссылкой должно быть заполнено",
