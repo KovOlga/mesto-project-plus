@@ -7,6 +7,7 @@ import NotFoundError from "../errors/not-found-err";
 import BadRequestError from "../errors/bad-request-err";
 import AuthenticationError from "../errors/authentication-err";
 import { SessionRequest } from "../middlewares/auth";
+import { JWT_SECRET } from "../config";
 
 export const createUser = (req: Request, res: Response, next: NextFunction) => {
   const { name, about, avatar, email, password } = req.body;
@@ -32,7 +33,7 @@ export const login = (req: Request, res: Response, next: NextFunction) => {
   const { email, password } = req.body;
   return User.findUserByCredentials(email, password)
     .then((user) => {
-      const token = jwt.sign({ _id: user._id }, "super-strong-secret", {
+      const token = jwt.sign({ _id: user._id }, JWT_SECRET, {
         expiresIn: "7d",
       });
       res.cookie("token", token, { httpOnly: true }).send({ token, user });

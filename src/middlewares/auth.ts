@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import jwt, { JwtPayload } from "jsonwebtoken";
+import { JWT_SECRET } from "../config";
 import AuthenticationError from "../errors/authentication-err";
 
 interface Jwt extends JwtPayload {
@@ -26,7 +27,7 @@ export default (req: SessionRequest, res: Response, next: NextFunction) => {
   let payload: Jwt | null = null;
 
   try {
-    payload = jwt.verify(token, "super-strong-secret") as Jwt;
+    payload = jwt.verify(token, JWT_SECRET) as Jwt;
   } catch (err) {
     return handleAuthError();
   }
