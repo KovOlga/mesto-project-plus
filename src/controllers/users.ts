@@ -16,7 +16,7 @@ export const createUser = (req: Request, res: Response, next: NextFunction) => {
     .then((hash) => User.create({ name, about, avatar, email, password: hash }))
     .then((user) => res.status(201).send(user))
     .catch((err) => {
-      if (err.name === "validationError") {
+      if (err.name === "ValidationError") {
         next(new BadRequestError(err.message));
       } else if (err.code === 11000) {
         next(
@@ -80,7 +80,11 @@ export const updateProfile = (
 ) => {
   const { name, about } = req.body;
 
-  return User.findByIdAndUpdate(req.user!._id, { name, about }, { new: true })
+  return User.findByIdAndUpdate(
+    req.user!._id,
+    { name, about },
+    { new: true, runValidators: true }
+  )
     .orFail(() => {
       throw new NotFoundError("Пользователь по указанному _id не найден");
     })
@@ -101,7 +105,11 @@ export const updateAvatar = (
 ) => {
   const { avatar } = req.body;
 
-  return User.findByIdAndUpdate(req.user!._id, { avatar }, { new: true })
+  return User.findByIdAndUpdate(
+    req.user!._id,
+    { avatar },
+    { new: true, runValidators: true }
+  )
     .orFail(() => {
       throw new NotFoundError("Пользователь по указанному _id не найден");
     })

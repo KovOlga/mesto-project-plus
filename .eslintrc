@@ -36,7 +36,7 @@
     "quotes": "off",
     "arrow-body-style": "off",
     "comma-dangle": "off",
-    "object-curly-newline": ["error", { "ImportDeclaration": "never" }],
+    "object-curly-newline": "off",
     "operator-linebreak": 0
   }
 }

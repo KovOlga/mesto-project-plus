@@ -37,15 +37,14 @@ export const deleteCardById = (
     })
     .then((card) => {
       if (card.owner.toString() === req.user!._id) {
-        Card.findByIdAndRemove(id).then(
+        return Card.deleteOne({ _id: id }).then(
           () =>
             // eslint-disable-next-line implicit-arrow-linebreak
             res.status(200).send({ message: "Пост удалён" })
           // eslint-disable-next-line function-paren-newline
         );
-      } else {
-        throw new AuthenticationError("Нельзя удалить чужую карточку");
       }
+      throw new AuthenticationError("Нельзя удалить чужую карточку");
     })
     .catch(next);
 };
