@@ -87,4 +87,4 @@ userSchema.static(
   }
 );
 
-export default mongoose.model<IUser, UserModel>("User", userSchema);
+export default mongoose.model<IUser, UserModel>("user", userSchema);

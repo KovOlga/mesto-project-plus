@@ -27,14 +27,14 @@ const cardSchema = new mongoose.Schema<ICard>(
     },
     owner: {
       type: Schema.Types.ObjectId,
-      ref: "User",
+      ref: "user",
       required: true,
     },
     likes: [
       {
         type: Schema.Types.ObjectId,
         default: [],
-        ref: "User",
+        ref: "user",
       },
     ],
     createdAt: {

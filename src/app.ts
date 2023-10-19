@@ -1,4 +1,3 @@
-import path from "path";
 import express from "express";
 import { errors } from "celebrate";
 import mongoose from "mongoose";
@@ -12,7 +11,6 @@ const app = express();
 mongoose.connect(DB_ADDRESS);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(express.static(path.join(__dirname, "public")));
 app.use(cookieParser());
 
 app.use(requestLogger);
