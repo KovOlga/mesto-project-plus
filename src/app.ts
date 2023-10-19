@@ -4,12 +4,9 @@ import { errors } from "celebrate";
 import mongoose from "mongoose";
 import cookieParser from "cookie-parser";
 import errorHandler from "./middlewares/error-handler";
-import auth from "./middlewares/auth";
-import UsersRouter from "./routes/users";
-import CardsRouter from "./routes/cards";
-import AuthenticationRouter from "./routes/authentication";
 import { PORT, DB_ADDRESS } from "./config";
 import { requestLogger, errorLogger } from "./middlewares/logger";
+import routes from "./routes";
 
 const app = express();
 mongoose.connect(DB_ADDRESS);
@@ -19,10 +16,7 @@ app.use(express.static(path.join(__dirname, "public")));
 app.use(cookieParser());
 
 app.use(requestLogger);
-app.use("/", AuthenticationRouter);
-app.use(auth);
-app.use("/users", UsersRouter);
-app.use("/cards", CardsRouter);
+app.use(routes);
 
 app.use(errorLogger);
 app.use(errors());
