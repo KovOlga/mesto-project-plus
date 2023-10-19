@@ -11,28 +11,21 @@ export interface SessionRequest extends Request {
   user?: Jwt;
 }
 
-const handleAuthError = () => {
-  throw new AuthenticationError("Необходима авторизация");
-};
-
 const extractBearerToken = (header: string | undefined) => {
   return header ? header.replace("Bearer ", "") : null;
 };
 
-// eslint-disable-next-line consistent-return
 export default (req: SessionRequest, res: Response, next: NextFunction) => {
-  // eslint-disable-next-line operator-linebreak
   const token =
     req.cookies.token || extractBearerToken(req.headers.authorization);
   let payload: Jwt | null = null;
 
   try {
     payload = jwt.verify(token, JWT_SECRET) as Jwt;
+    req.user = payload;
+
+    next();
   } catch (err) {
-    return handleAuthError();
+    next(new AuthenticationError("Необходима авторизация"));
   }
-
-  req.user = payload;
-
-  next();
 };
