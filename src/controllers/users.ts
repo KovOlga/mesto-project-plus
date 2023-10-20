@@ -1,5 +1,6 @@
 /* eslint-disable object-curly-newline */
 import { Request, Response, NextFunction } from "express";
+import { Error } from "mongoose";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import User from "../models/user";
@@ -16,7 +17,7 @@ export const createUser = (req: Request, res: Response, next: NextFunction) => {
     .then((hash) => User.create({ name, about, avatar, email, password: hash }))
     .then((user) => res.status(201).send(user))
     .catch((err) => {
-      if (err.name === "ValidationError") {
+      if (err instanceof Error.ValidationError) {
         next(new BadRequestError(err.message));
       } else if (err.code === 11000) {
         next(
@@ -90,7 +91,7 @@ export const updateProfile = (
     })
     .then((user) => res.status(200).send(user))
     .catch((err) => {
-      if (err.name === "validationError") {
+      if (err instanceof Error.ValidationError) {
         next(new BadRequestError(err.message));
       } else {
         next(err);
@@ -115,7 +116,7 @@ export const updateAvatar = (
     })
     .then((user) => res.status(200).send(user))
     .catch((err) => {
-      if (err.name === "validationError") {
+      if (err instanceof Error.ValidationError) {
         next(new BadRequestError(err.message));
       } else {
         next(err);
