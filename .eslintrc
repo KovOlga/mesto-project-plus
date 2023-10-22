@@ -37,6 +37,9 @@
     "arrow-body-style": "off",
     "comma-dangle": "off",
     "object-curly-newline": "off",
-    "operator-linebreak": 0
+    "operator-linebreak": 0,
+    "function-paren-newline": "off",
+    "implicit-arrow-linebreak": "off",
+    "newline-per-chained-call": ["error", { "ignoreChainWithDepth": 5 }]
   }
 }
