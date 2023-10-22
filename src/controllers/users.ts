@@ -74,18 +74,16 @@ export const getCurrentUser = (
   getUserInfoById(req.user!._id, res, next);
 };
 
-export const updateProfile = (
+const updateUserInfo = (
   req: SessionRequest,
   res: Response,
   next: NextFunction
 ) => {
-  const { name, about } = req.body;
-
-  return User.findByIdAndUpdate(
-    req.user!._id,
-    { name, about },
-    { new: true, runValidators: true }
-  )
+  const {
+    user: { _id },
+    body,
+  } = req.body;
+  return User.findByIdAndUpdate(_id, body, { new: true, runValidators: true })
     .orFail(() => {
       throw new NotFoundError("Пользователь по указанному _id не найден");
     })
@@ -99,27 +97,18 @@ export const updateProfile = (
     });
 };
 
+export const updateProfile = (
+  req: SessionRequest,
+  res: Response,
+  next: NextFunction
+) => {
+  updateUserInfo(req, res, next);
+};
+
 export const updateAvatar = (
   req: SessionRequest,
   res: Response,
   next: NextFunction
 ) => {
-  const { avatar } = req.body;
-
-  return User.findByIdAndUpdate(
-    req.user!._id,
-    { avatar },
-    { new: true, runValidators: true }
-  )
-    .orFail(() => {
-      throw new NotFoundError("Пользователь по указанному _id не найден");
-    })
-    .then((user) => res.status(200).send(user))
-    .catch((err) => {
-      if (err instanceof Error.ValidationError) {
-        next(new BadRequestError(err.message));
-      } else {
-        next(err);
-      }
-    });
+  updateUserInfo(req, res, next);
 };
