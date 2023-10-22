@@ -46,7 +46,8 @@ export const deleteCardById = (
     .catch(next);
 };
 
-export const putLike = (
+const handleLike = (
+  handleMethod: string,
   req: SessionRequest,
   res: Response,
   next: NextFunction
@@ -55,7 +56,7 @@ export const putLike = (
 
   return Card.findByIdAndUpdate(
     id,
-    { $addToSet: { likes: req.user!._id } },
+    { [handleMethod]: { likes: req.user!._id } },
     { new: true }
   )
     .orFail(() => {
@@ -67,23 +68,18 @@ export const putLike = (
     .catch(next);
 };
 
+export const putLike = (
+  req: SessionRequest,
+  res: Response,
+  next: NextFunction
+) => {
+  handleLike("$addToSet", req, res, next);
+};
+
 export const deleteLike = (
   req: SessionRequest,
   res: Response,
   next: NextFunction
 ) => {
-  const { id } = req.params;
-
-  return Card.findByIdAndUpdate(
-    id,
-    { $pull: { likes: req.user!._id } },
-    { new: true }
-  )
-    .orFail(() => {
-      throw new NotFoundError("Передан несуществующий _id карточки");
-    })
-    .populate("owner")
-    .populate("likes")
-    .then((card) => res.status(200).send(card))
-    .catch(next);
+  handleLike("$pull", req, res, next);
 };
