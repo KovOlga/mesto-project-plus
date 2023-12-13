@@ -11,6 +11,7 @@ import routes from "./routes";
 const app = express();
 app.use(
   cors({
+    origin: "http://api.mesto.project.nomoredomainsmonster.ru",
     credentials: true,
   })
 );
