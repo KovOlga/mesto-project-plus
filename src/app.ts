@@ -9,7 +9,11 @@ import { requestLogger, errorLogger } from "./middlewares/logger";
 import routes from "./routes";
 
 const app = express();
-app.use(cors());
+app.use(
+  cors({
+    credentials: true,
+  })
+);
 mongoose.connect(DB_ADDRESS);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
